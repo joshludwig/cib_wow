@@ -13,7 +13,9 @@ loot_thread = Thread.new {
 # update slack
     payloads = SlackWebHook::create_payloads(items)
     SlackWebHook::update_slack(payloads)
-    last_check = DateTime.now + (1/24.0)
+    unless items.empty?
+      last_check = DateTime.now + (1/24.0)
+    end
     sleep 15
   end
 }
