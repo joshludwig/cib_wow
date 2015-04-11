@@ -7,16 +7,15 @@ RestClient.post "https://hooks.slack.com/services/#{ENV['SLACK_API_KEY']}", live
 
 loot_thread = Thread.new {
   last_check = DateTime.now + (1/24.0)
-
   while true
     items = WowLootFeed::get_new_items last_check
+    unless items.empty?
+      last_check = Time.at(items[0][:timestamp]/1000).to_datetime
+    end
 # update slack
     payloads = SlackWebHook::create_payloads(items)
     SlackWebHook::update_slack(payloads)
-    unless items.empty?
-      last_check = DateTime.now + (1/24.0)
-    end
-    sleep 15
+    sleep 5
   end
 }
 loot_thread.run

@@ -5,7 +5,14 @@ module WowLootFeed
     item_result = RestClient.get "https://us.api.battle.net/wow/item/#{id}?locale=en_US&apikey=#{ENV['BLIZZARD_API_KEY']}"
     item_hash = JSON.parse(item_result)
     if item_hash['name'].nil?
-      name = 'Raid Finder Loot'
+      begin
+        context = item_hash['availableContexts'][0]
+        result = RestClient.get "https://us.api.battle.net/wow/item/#{item_hash['id']}/#{context}?locale=en_US&apikey=#{ENV['BLIZZARD_API_KEY']}"
+        context_item = JSON.parse(result)
+        name = context_item['name']
+      rescue
+        name = 'Raid Finder Loot'
+      end
     else
       name = item_hash['name']
     end
@@ -18,7 +25,7 @@ module WowLootFeed
     item_loot = result_hash['news']
     item_loot.select! { |v| v['type'] == 'itemLoot' }
     item_loot.select! { |v| Time.at(v['timestamp']/1000).to_datetime > last_check }
-    items = item_loot.map { |x| {character: x['character'], item: get_item_name(x['itemId']), url: "http://www.wowhead.com/item=#{x['itemId']}"} }
+    items = item_loot.map { |x| {character: x['character'], item: get_item_name(x['itemId']), url: "http://www.wowhead.com/item=#{x['itemId']}", timestamp: x['timestamp']} }
     items
   end
 
