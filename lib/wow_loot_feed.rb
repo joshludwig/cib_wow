@@ -16,6 +16,7 @@ module WowLootFeed
     result = RestClient.get "https://us.api.battle.net/wow/guild/area-52/cib?fields=news&locale=en_US&apikey=#{ENV['BLIZZARD_API_KEY']}"
     result_hash = JSON.parse(result)
     item_loot = result_hash['news']
+    item_loot.select! { |v| v['type'] == 'itemLoot' }
     item_loot.select! { |v| Time.at(v['timestamp']/1000).to_datetime > last_check }
     items = item_loot.map { |x| {character: x['character'], item: get_item_name(x['itemId']), url: "http://www.wowhead.com/item=#{x['itemId']}"} }
     items
