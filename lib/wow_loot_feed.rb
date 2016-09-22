@@ -20,7 +20,7 @@ module WowLootFeed
   end
 
   def self.get_new_items(last_check)
-    result = RestClient.get "https://us.api.battle.net/wow/guild/area-52/cib?fields=news&locale=en_US&apikey=#{ENV['BLIZZARD_API_KEY']}"
+    result = RestClient.get "https://us.api.battle.net/wow/guild/area-52/Covered%20in%20Bees?fields=news&locale=en_US&apikey=#{ENV['BLIZZARD_API_KEY']}"
     result_hash = JSON.parse(result)
     item_loot = result_hash['news']
     item_loot.select! { |v| v['type'] == 'itemLoot' }
